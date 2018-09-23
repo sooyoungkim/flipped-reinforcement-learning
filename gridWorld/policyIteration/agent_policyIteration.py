@@ -108,7 +108,7 @@ class PolicyIteration:
             for action in self.env.possible_actions:
                 next_state = self.env.state_after_action(state, action)
                 reward = self.env.get_reward(state, action)
-                # 벨만 기대 방정식 : 'ㅠ(a|s) * 큐함수' 을 계산해서 더하는 것을 반복한다. => 기대값을 계산한 것이 된다.
+                # 벨만 기대 방정식 : 'ㅠ(a|s) * state-value function' 을 계산해서 더하는 것을 반복한다. => 기대값을 계산한 것이 된다.
                 value += self.get_policy(state)[action] * (
                         reward + self.discount_factor * self.get_value(next_state))
 
@@ -143,7 +143,7 @@ class PolicyIteration:
             for index, action in enumerate(self.env.possible_actions):
                 next_state = self.env.state_after_action(state, action)
                 reward = self.env.get_reward(state, action)
-                # 큐함수 : '보상 + (감가율 * 상태변환확률(여기서는 1로 가정) * 다음 상태 가치함수)' 을 계산
+                # state-value function : '보상 + (감가율 * 상태변환확률(여기서는 1로 가정) * 다음 상태 가치함수)' 을 계산
                 value = reward + self.discount_factor * self.get_value(next_state)
 
                 # 받을 보상이 최대인 행동의 index 만을 추려낸다.

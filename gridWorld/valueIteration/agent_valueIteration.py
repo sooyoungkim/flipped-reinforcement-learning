@@ -76,12 +76,12 @@ class ValueIteration:
             value_list = []  # 가치 함수를 위한 빈 리스트
 
             # 현재 에이전트는 '상,하,좌,우'로 행동이 가능
-            # 가능한 모든 행동에 대해서 큐함수 계산
+            # 가능한 모든 행동에 대해서 state-value function 계산
             for action in self.env.possible_actions:
                 next_state = self.env.state_after_action(state, action)
                 reward = self.env.get_reward(state, action)
                 next_value = self.get_value(next_state)
-                # 큐함수 : '보상 + (감가율 * 상태변환확률(여기서는 1로 가정) * 다음 상태 가치함수)' 을 계산
+                # state-value function : '보상 + (감가율 * 상태변환확률(여기서는 1로 가정) * 다음 상태 가치함수)' 을 계산
                 value_list.append((reward + self.discount_factor * next_value))
 
             # 특정 상태에 대해 최댓값을 다음 가치 함수로 대입 (소수점 둘째 자리까지 표현)
@@ -109,11 +109,11 @@ class ValueIteration:
         
         """
         # 현재 에이전트는 '상,하,좌,우'로 행동이 가능
-        # (벨만 최적 방정식을 통해 구한 가치함수를 토대로) 가능한 모든 행동에 대해서 큐함수 값을 계산해서 비교 -> 탐욕 정책 사용
+        # (벨만 최적 방정식을 통해 구한 가치함수를 토대로) 가능한 모든 행동에 대해서 state-value function 값을 계산해서 비교 -> 탐욕 정책 사용
         for action in self.env.possible_actions:
             next_state = self.env.state_after_action(state, action)
             reward = self.env.get_reward(state, action)
-            # 큐함수 = '보상 + (감가율 * 상태변환확률(여기서는 1로 가정) * 다음 상태 가치함수)' 을 계산
+            # state-value function = '보상 + (감가율 * 상태변환확률(여기서는 1로 가정) * 다음 상태 가치함수)' 을 계산
             value = (reward + self.discount_factor * self.get_value(next_state))
 
             # 받을 보상이 최대인 행동만(복수일 경우 여러 개)을 추려낸다.
