@@ -29,10 +29,10 @@ class SARSA:
 
     # <s, a, r, s', a'> 샘플로부터 큐함수 값을 업데이트
     def learn(self, state, action, reward, next_state, next_action):
-        current_q = self.q_table[state][action]
-        next_state_q = self.q_table[next_state][next_action]
-        new_q = (current_q + self.learning_rate * (reward + self.discount_factor * next_state_q - current_q))
-        self.q_table[state][action] = new_q
+        q_1 = self.q_table[state][action]
+        # 벨만 기대 방정식을 사용한 큐함수 값의 업데이트
+        q_2 = reward + self.discount_factor * self.q_table[next_state][next_action]
+        self.q_table[state][action] += self.learning_rate * (q_2 - q_1)
 
     """
     입실론 탐욕 정책에 따라서 action 반환
@@ -44,7 +44,7 @@ class SARSA:
             # 입실론 보다 적으면 무작위 행동 반환 - action([0, 1, 2, 3]) 중 하나 랜덤 반환
             action = np.random.choice(self.actions)
         else:
-            # 큐함수값이 최대인 action 반환
+            # 큐함수 값이 최대인 action 반환
             value = self.q_table[state]
             action = self.arg_max(value)
         return action
