@@ -4,12 +4,12 @@
 #   sample 에 의한 experience 만 얻을 수 있는 정보이다.
 # - 무작위(random) sample 을 기반으로 complete return (not partial return) 에 대한 평균(mean)을 구한다.
 #       L MC는 bootstrap 이 아니다.
-#               L bootstrap : 다른 state의 state-value 예상값에 의존하여 현재 state 의 state-value 값을 예측하는 방법
+#               L bootstrap : 다른 state 의 value 예상값에 의존하여 현재 state 의 value 값을 예측하는 방법
 # - 더 많은 return 을 얻을수록 그 평균치는 기대치에 수렴할 것이다.
 #
 # (1) 경험을 통한 학습 :
 #       MC method 는 environment 와의 모의(simulated) 또는 실제(actual) interaction 을 통해 얻은
-#       states, action, rewards 가 포함된 sample 이라고 불리우는 경험(experience)을 이용한다.
+#       <state, action, reward> 가 포함된 sample 이라고 불리우는 경험(experience)을 이용한다.
 # (2) 에피소드 단위의 학습 :
 #       episodic tasks 에 대해 적용하는 것을 가정한다. 즉, step-by-step 보다는 episode-by-episode 단위의 학습이다.
 #
@@ -34,12 +34,12 @@ class MonteCarlo:
         self.learning_rate = 0.01   # step size
         self.discount_factor = 0.9  # 감가율
         self.epsilon = 0.1          # 입실론
-        self.sampling = []           # 하나의 episode 에 대한 모든 trajectory 의 next_state, reward, done 저장
+        self.sample = []            # 하나의 episode 내 모든 trajectory [next_state, reward, done] 저장
         self.value_table = defaultdict(float)   # 에이전트가 방문한 state 의 value function 값 저장
 
-    # 메모리에 sample 저장
-    def save_sample(self, state, reward, done):
-        self.sampling.append([state, reward, done])
+    # 메모리에 저장해두기
+    def save_step(self, state, reward, done):
+        self.sample.append([state, reward, done])
 
     """
     에피소드에서 에이전트가 방문한 state 의 value function 업데이트
@@ -65,8 +65,8 @@ class MonteCarlo:
         visit_state = []
 
         # 하나의 에피소드의 모든 샘플에 대해
-        print("samples : ", self.sampling)
-        for sample in reversed(self.sampling):
+        print("samples : ", self.sample)
+        for sample in reversed(self.sample):  # [next_state, reward, done]
             state_s = str(sample[0])    # 예) '[1,2]'
 
             # 첫번째 visit 에 대한 것만 평균값 계산 -> 두번 이상 방문한 state with Return G는 계산되지 않는다.
@@ -75,9 +75,9 @@ class MonteCarlo:
                 visit_state.append(state_s)
                 # reverse 해서 사용하므로 G6 -> G5 -> G4 -> G3 -> G2 -> G1의 형태로 계산된다. (책 44P)
                 return_s = self.discount_factor * (sample[1] + return_s)
-                # 현재 state 의 value function 값
+                # state 의 기존 value function 값
                 value_s = self.value_table[state_s]
-                # return 평균값으로 state 의 value function 값 업데이트
+                # return 평균값 계산해서 state 의 value function 값 업데이트
                 self.value_table[state_s] = (value_s + self.learning_rate * (return_s - value_s))  # (PT 2P)
 
     """
@@ -87,22 +87,22 @@ class MonteCarlo:
     """
     def get_action(self, state):
         if np.random.rand() < self.epsilon:
-            # 입실론 보다 적으면 랜덤 action([0, 1, 2, 3]) 중 하나 반환
+            # 입실론 보다 적으면 action([0, 1, 2, 3]) 중 하나 랜덤 반환
             action = np.random.choice(self.actions)
         else:
             # state 에서 취할 수 있는 action 의 value function 값 얻기
             value = self.possible_state_value(state)
-            # value function 이 최대값인 action 반환
+            # value function 값이 최대인 action 반환
             action = self.arg_max(value)
         return int(action)
 
     @staticmethod
-    def arg_max(args):
+    def arg_max(state_value):
         max_index_list = []
-        max_value = args[0]   # 첫 번째 값을 max 설정해서 비교
+        max_value = state_value[0]   # 첫 번째 값을 max 설정해서 비교
 
         # 최대값 계산
-        for index, value in enumerate(args):
+        for index, value in enumerate(state_value):
             if value > max_value:
                 max_index_list.clear()
                 max_value = value
@@ -145,7 +145,7 @@ class MonteCarlo:
         else:
             state_value[3] = self.value_table[str(state)]
 
-        # print("next_state = ", next_state)
+        # print(state_value)
         # [0.0, 0.0, 0.0, -0.7290000000000001]
         #  ...
         return state_value
@@ -157,6 +157,7 @@ if __name__ == "__main__":
 
     # generate an episodes
     for episode in range(10):   # 1000
+        # 게임 환경 초기화
         state = env.reset()
 
         # 입실론 탐욕 정책에 따라서 특정 state 의 action 얻기
@@ -165,19 +166,19 @@ if __name__ == "__main__":
         while True:
             env.render()
 
-            # 현재 state에서 action 취하기
+            # 현재 state 에서 action 취하기
             # 환경으로 부터 다음 상태(next_state)와 보상(reward)을 받는다.
             #   L state)는 리스트, 보상(reward)은 숫자, 완료 여부(done)는 boolean
             next_state, reward, done = env.step(action)
-            # 메모리에 sample 저장 : 몬테카를로 예측에서는 Rt+1, St+1 을 샘플로 사용한다.
-            agent.save_sample(next_state, reward, done)
+            # 각 스텝의 결과를 저장해두기
+            agent.save_step(next_state, reward, done)
             # 다음 상태(state)에서 취할 수 있는 action 얻기
             action = agent.get_action(next_state)
 
-            # 하나의 에피소드가 완료되어야만 지나온 모든 state 의 value function 을 업데이트한다.
-            # 에피소드가 끝이 없거나 길이가 긴 경우에는 몬테카를로 예측은 적합하지 않다.
+            # '하나의 에피소드가 완료되어야만' 지나온 모든 state 의 value function 을 업데이트한다. (하나의 episode 를 샘플링)
+            # => 에피소드가 끝이 없거나 길이가 긴 경우에는 몬테카를로 예측은 적합하지 않다.
             if done:
                 agent.update()
-                agent.sampling.clear()
+                agent.sample.clear()
                 break
 
