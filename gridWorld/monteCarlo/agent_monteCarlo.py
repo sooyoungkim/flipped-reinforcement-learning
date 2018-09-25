@@ -20,11 +20,6 @@
 # (2) Every-visit MC method :
 #       하나의 episode 에서 state s의 모든 visit 을 고려하여 return 값의 평균을 계산한다.
 ##########################################################################################################
-
-# Model 을 알수 없다면 q*를 구하는 것이 유용하다.
-# 염려되는 점이라면, 한번도 접하지 않은 state-action pair가 있을 수 있다는 사실이다. 끊임없는 exploration 을 보장해야 한다.
-# 모든 state-action pair 를 접해볼 수 있도록 보장하는 가장 흔한 대안은 non-zero probability 를 가진 stochastic policy 만을 고려하는 것이다.
-# ######################################################################################
 import numpy as np
 import random
 from collections import defaultdict
