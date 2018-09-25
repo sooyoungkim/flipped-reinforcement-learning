@@ -39,12 +39,12 @@ class MonteCarlo:
         self.learning_rate = 0.01   # step size
         self.discount_factor = 0.9  # 감가율
         self.epsilon = 0.1          # 입실론
-        self.samples = []           # 하나의 episode 에 대한 모든 trajectory 의 next_state, reward, done 저장
+        self.sampling = []           # 하나의 episode 에 대한 모든 trajectory 의 next_state, reward, done 저장
         self.value_table = defaultdict(float)   # 에이전트가 방문한 state 의 value function 값 저장
 
     # 메모리에 sample 저장
     def save_sample(self, state, reward, done):
-        self.samples.append([state, reward, done])
+        self.sampling.append([state, reward, done])
 
     """
     에피소드에서 에이전트가 방문한 state 의 value function 업데이트
@@ -70,8 +70,8 @@ class MonteCarlo:
         visit_state = []
 
         # 하나의 에피소드의 모든 샘플에 대해
-        print("samples : ", self.samples)
-        for sample in reversed(self.samples):
+        print("samples : ", self.sampling)
+        for sample in reversed(self.sampling):
             state_s = str(sample[0])    # 예) '[1,2]'
 
             # 첫번째 visit 에 대한 것만 평균값 계산 -> 두번 이상 방문한 state with Return G는 계산되지 않는다.
@@ -183,6 +183,6 @@ if __name__ == "__main__":
             # 에피소드가 끝이 없거나 길이가 긴 경우에는 몬테카를로 예측은 적합하지 않다.
             if done:
                 agent.update()
-                agent.samples.clear()
+                agent.sampling.clear()
                 break
 
