@@ -1,5 +1,5 @@
 ##############################################################################################################
-# SARSA (Temporal-Difference Control)
+# SARSA (On-Policy Temporal-Difference Control)
 #
 # (1) 경험을 통한 학습 :
 #       <state, action, reward, next state, next action> 가 포함된 sample 이라고 불리우는 경험(experience)을 이용한다.
