@@ -68,14 +68,14 @@ class SARSA:
 
 if __name__ == "__main__":
     env = Env()
-    agent = SARSA(actions=list(range(env.n_actions)))
+    agent = SARSA(actions=list(range(env.n_actions)))   # 4 -> [0, 1, 2, 3]
 
     # generate an episodes
     for episode in range(10):   # 1000
         # 게임 환경 초기화
-        state = env.reset()
+        state = env.reset()     # [0, 0]
 
-        # 입실론 탐욕 정책에 따라서 특정 state 의 action 얻기
+        # 입실론 탐욕 정책에 따라서 현재 상태에 대한 행동 선택
         action = agent.get_action(str(state))
 
         while True:
@@ -85,7 +85,7 @@ if __name__ == "__main__":
             # 환경으로 부터 다음 상태(next_state)와 보상(reward)을 받는다.
             #   L state)는 리스트, 보상(reward)은 숫자, 완료 여부(done)는 boolean
             next_state, reward, done = env.step(action)
-            # 다음 상태(state)에서 취할 수 있는 action 얻기
+            # 다음 상태(state)에서 취할 수 있는 action 선택
             next_action = agent.get_action(str(next_state))
 
             # sample <s,a,r,s',a'> 로 큐함수 값 업데이트 -> 매 타임스템마다 큐함수 값을 업데이트 한다.

@@ -85,7 +85,9 @@ class Env(tk.Tk):
     ---------------
         :return 좌표 정보를 state 로 반환
     """
-    def coords_to_state(self, coords):
+
+    @staticmethod
+    def coords_to_state(coords):
         x = int((coords[0] - 50) / 100)
         y = int((coords[1] - 50) / 100)
         return [x, y]
