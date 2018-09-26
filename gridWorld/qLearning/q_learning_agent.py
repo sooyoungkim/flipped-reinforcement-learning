@@ -18,7 +18,7 @@
 ##############################################################################################################
 import numpy as np
 import random
-from gridWorld.QLearning.environment import Env
+from gridWorld.qLearning.environment import Env
 from collections import defaultdict
 
 
