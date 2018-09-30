@@ -60,7 +60,7 @@ class DeepSARSA:
     _________________________________________________________________
     dense_3 (Dense)              (None, 5)                 155  <- (1+30) *  5  
     =================================================================
-    Total params: 1,565
+    Total params: 1,565     <- 480 + 930 + 155
     Trainable params: 1,565
     Non-trainable params: 0
     _________________________________________________________________
@@ -74,7 +74,7 @@ class DeepSARSA:
         model.add(Dense(self.action_size, activation='linear'))
         # 모델정보 출력
         model.summary()
-        # 오차함수와 최적
+        # 오차함수와 가중치 최적화
         model.compile(loss='mse', optimizer=Adam(lr=self.learning_rate))
         return model
 
@@ -182,7 +182,7 @@ if __name__ == "__main__":
             # 다음 상태(state)에서 취할 수 있는 action 선택
             next_action = agent.get_action(next_state)
 
-            # sample <s,a,r,s',a'> 로 큐함수 값 업데이트 -> 매 타임스템마다 큐함수 값을 업데이트 한다.
+            # sample <s,a,r,s',a'> 로 큐함수 값 업데이트 -> '매 타임스템마다 큐함수 값을 업데이트' 한다.
             agent.train_model(state, action, reward, next_state, next_action, done)
 
             score += reward
@@ -192,7 +192,7 @@ if __name__ == "__main__":
             if done:
                 # 에피소드마다 학습 결과 출력
                 # <몇 번째 에피소드인지, 해당 에피소드에서 점수는 몇 점인지, 총 타임스텝, 입실론> 출력
-                print("episode:", (e + 1), "  score:", score, "total_step", total_step, "  epsilon:", agent.epsilon)
+                print("episode:", (e + 1), "  score:", score, "time_step:", total_step, "  epsilon:", agent.epsilon)
 
         # # 100 에피소드마다 모델 저장
         # if e % 100 == 0:
