@@ -103,7 +103,8 @@ class Reinforce:
         (2) 최적화 함수 생성 : 최적 업데이트 기울기값 계산
         """
         optimizer = Adam(lr=self.learning_rate)
-        updates = optimizer.get_updates(self.model.trainable_weights, [], loss)
+        # updates = optimizer.get_updates(self.model.trainable_weights, [], loss)   # Old interface: (params, constraints, loss)
+        updates = optimizer.get_updates(loss, self.model.trainable_weights)         # New interface: (loss, params)
 
         """
         (3) 정책신경망을 업데이트하는 훈련함수 생성
